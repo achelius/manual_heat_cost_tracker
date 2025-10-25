@@ -13,5 +13,6 @@
     "sensor",
     "number"
   ],
-  "config_flow": true
+  "config_flow": true,
+  "icon": "icon.svg"
 }

@@ -1,3 +1,3 @@
 """Constants for the Heat Cost Allocator integration."""
 
-DOMAIN = "heat_cost_allocator"
+DOMAIN = "manual_heat_cost_allocator"

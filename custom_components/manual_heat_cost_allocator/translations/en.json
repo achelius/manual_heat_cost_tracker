@@ -1,10 +1,16 @@
 {
-  "title": "Heat Cost Allocator",
+  "title": "Manual Heat Cost Allocator",
   "config": {
     "step": {
       "user": {
-        "title": "Configure Heat Cost Allocator"
+        "title": "Configure Manual Heat Cost Allocator",
+        "data": {
+          "prefix": "Prefix for entities"
+        }
       }
+    },
+    "error": {
+      "prefix": "Prefix is required."
     }
   }
 }

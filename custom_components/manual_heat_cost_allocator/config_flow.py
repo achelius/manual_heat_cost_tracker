@@ -18,10 +18,18 @@ class HeatCostAllocatorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     title=f"Heat Cost Allocator ({prefix})",
                     data={"prefix": prefix, "area": area}
                 )
+        # Use Home Assistant selector for area
         return self.async_show_form(
             step_id="user",
             data_schema=self._get_data_schema(),
-            errors=errors
+            errors=errors,
+            description_placeholders=None,
+            last_step=False,
+            selector={
+                "area": {
+                    "area": {}
+                }
+            }
         )
 
     def _get_data_schema(self):

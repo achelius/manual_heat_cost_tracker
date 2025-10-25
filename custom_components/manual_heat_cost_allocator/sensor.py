@@ -33,8 +33,10 @@ class HeatCostAllocatorSensor(SensorEntity):
 
     @property
     def native_value(self):
-        # Always read from hass.data if available
-        value = self.hass.data.get(DOMAIN, {}).get("current_value")
+        # Always read from hass.data if available, per device
+        value = None
+        if DOMAIN in self.hass.data and "values" in self.hass.data[DOMAIN]:
+            value = self.hass.data[DOMAIN]["values"].get(self._config_entry_id)
         if value is not None:
             return int(value)
         return self._attr_native_value

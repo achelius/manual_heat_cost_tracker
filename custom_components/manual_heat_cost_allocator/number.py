@@ -29,18 +29,26 @@ class HeatCostAllocatorNumber(NumberEntity):
     def device_info(self):
         return get_device_info(self._prefix, self._config_entry_id, self._area_id)
 
-    @property
-    def native_value(self):
-        return int(self._attr_native_value)
-
     async def async_set_native_value(self, value: float) -> None:
         self._attr_native_value = int(value)
-        # Store the value in hass.data for the sensor to read
+        # Store the value in hass.data for the sensor to read, per device
         if DOMAIN not in self.hass.data:
             self.hass.data[DOMAIN] = {}
-        self.hass.data[DOMAIN]["current_value"] = self._attr_native_value
+        if "values" not in self.hass.data[DOMAIN]:
+            self.hass.data[DOMAIN]["values"] = {}
+        self.hass.data[DOMAIN]["values"][self._config_entry_id] = self._attr_native_value
         self.async_write_ha_state()
         # Notify the sensor entity to update
         sensor = self.hass.data[DOMAIN].get("sensor_entity")
-        if sensor:
+        if sensor and getattr(sensor, '_config_entry_id', None) == self._config_entry_id:
             sensor.update_value(self._attr_native_value)
+
+    @property
+    def native_value(self):
+        # Return the value for this device
+        value = None
+        if DOMAIN in self.hass.data and "values" in self.hass.data[DOMAIN]:
+            value = self.hass.data[DOMAIN]["values"].get(self._config_entry_id)
+        if value is not None:
+            return int(value)
+        return int(self._attr_native_value)

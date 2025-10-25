@@ -14,9 +14,8 @@ jobs:
 
       - name: Create component zip
         run: |
-          cd custom_components
-          zip -r manual_heat_cost_allocator.zip manual_heat_cost_allocator
-          mv manual_heat_cost_allocator.zip ../manual_heat_cost_allocator.zip
+          cd custom_components/manual_heat_cost_allocator
+          zip -r ../../manual_heat_cost_allocator.zip .
 
       - name: Create GitHub Release with zip
         uses: softprops/action-gh-release@v2

@@ -8,13 +8,15 @@ async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the Heat Cost Allocator integration."""
     return True
 
+
 async def async_setup_entry(hass: HomeAssistant, entry):
     """Set up Heat Cost Allocator from a config entry."""
     hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(entry, "sensor")
+        hass.config_entries.async_forward_entry_setups(entry, ["sensor", "number"])
     )
     return True
 
+
 async def async_unload_entry(hass: HomeAssistant, entry):
     """Unload a config entry."""
-    return await hass.config_entries.async_forward_entry_unload(entry, "sensor")
+    return await hass.config_entries.async_forward_entry_unloads(entry, ["sensor", "number"])

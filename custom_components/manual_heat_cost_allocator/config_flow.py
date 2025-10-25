@@ -10,15 +10,13 @@ class HeatCostAllocatorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             prefix = user_input.get("prefix", "").strip()
-            area = user_input.get("area")
             if not prefix:
                 errors["prefix"] = "required"
             else:
                 return self.async_create_entry(
                     title=f"Heat Cost Allocator ({prefix})",
-                    data={"prefix": prefix, "area": area}
+                    data={"prefix": prefix}
                 )
-        # Use Home Assistant selector for area
         return self.async_show_form(
             step_id="user",
             data_schema=self._get_data_schema(),
@@ -29,6 +27,5 @@ class HeatCostAllocatorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         from homeassistant.helpers import config_validation as cv
         import voluptuous as vol
         return vol.Schema({
-            vol.Required("prefix"): cv.string,
-            vol.Optional("area"): str
+            vol.Required("prefix"): cv.string
         })

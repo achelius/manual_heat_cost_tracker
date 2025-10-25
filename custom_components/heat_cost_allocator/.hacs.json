@@ -1,0 +1,10 @@
+{
+  "name": "Manual Heat Cost Allocator",
+  "content_in_root": false,
+  "domains": ["sensor", "number"],
+  "country": ["all"],
+  "homeassistant": ">=2023.0.0",
+  "iot_class": "local_push",
+  "render_readme": true,
+  "filename": "custom_components/heat_cost_allocator/manifest.json"
+}

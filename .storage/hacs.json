@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "repositories": [
+    {
+      "id": "manual_heat_cost_allocator",
+      "full_name": "achelius/manual_heat_cost_tracker",
+      "category": "integration"
+    }
+  ]
+}

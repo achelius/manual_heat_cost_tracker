@@ -1,0 +1,10 @@
+{
+  "title": "Heat Cost Allocator",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure Heat Cost Allocator"
+      }
+    }
+  }
+}

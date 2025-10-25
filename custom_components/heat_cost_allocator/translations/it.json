@@ -1,0 +1,16 @@
+{
+  "title": "Ripartitore di Calore",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configura Ripartitore di Calore",
+        "data": {
+          "prefix": "Prefisso per le entità"
+        }
+      }
+    },
+    "error": {
+      "prefix": "Il prefisso è obbligatorio."
+    }
+  }
+}

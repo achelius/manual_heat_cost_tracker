@@ -1,0 +1,8 @@
+# Describe your service(s) here for the Heat Cost Allocator integration
+# Example:
+# set_value:
+#   description: 'Set the current value of the heat cost allocator.'
+#   fields:
+#     value:
+#       description: 'The value to set.'
+#       example: 123

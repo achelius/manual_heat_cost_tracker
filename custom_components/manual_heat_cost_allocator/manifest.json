@@ -1,7 +1,7 @@
 {
   "domain": "manual_heat_cost_allocator",
   "name": "Manual Heat Cost Allocator",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "documentation": "https://github.com/achelius/manual_heat_cost_tracker",
   "requirements": [],
   "dependencies": [],

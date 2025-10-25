@@ -1,0 +1,27 @@
+name: Release Custom Component Zip
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create component zip
+        run: |
+          cd custom_components
+          zip -r manual_heat_cost_allocator.zip manual_heat_cost_allocator
+          mv manual_heat_cost_allocator.zip ../manual_heat_cost_allocator.zip
+
+      - name: Create GitHub Release with zip
+        uses: softprops/action-gh-release@v2
+        with:
+          files: manual_heat_cost_allocator.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

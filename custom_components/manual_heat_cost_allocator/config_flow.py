@@ -22,14 +22,7 @@ class HeatCostAllocatorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=self._get_data_schema(),
-            errors=errors,
-            description_placeholders=None,
-            last_step=False,
-            selector={
-                "area": {
-                    "area": {}
-                }
-            }
+            errors=errors
         )
 
     def _get_data_schema(self):

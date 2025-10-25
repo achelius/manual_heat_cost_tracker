@@ -17,6 +17,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 class HeatCostAllocatorSensor(SensorEntity):
     """Representation of a Heat Cost Allocator sensor."""
 
+    _attr_icon = "mdi:numeric"
+
     def __init__(self, hass, prefix, config_entry_id=None, area_id=None):
         self.hass = hass
         self._prefix = prefix

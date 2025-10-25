@@ -14,5 +14,5 @@
     "number"
   ],
   "config_flow": true,
-  "icon": "icon.svg"
+  "icon": "icon.png"
 }

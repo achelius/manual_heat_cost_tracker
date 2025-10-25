@@ -1,11 +1,23 @@
 from .device import get_device_info
 """Number platform for Heat Cost Allocator."""
 from homeassistant.components.number import NumberEntity
+from homeassistant.helpers.storage import Store
 from .const import DOMAIN
+
+METER_STORE_KEY = "manual_heat_cost_allocator.meter_values"
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     prefix = config_entry.data.get("prefix", "")
     area_id = config_entry.data.get("area")
+    # Load stored values
+    store = Store(hass, 1, METER_STORE_KEY)
+    if DOMAIN not in hass.data:
+        hass.data[DOMAIN] = {}
+    if "values" not in hass.data[DOMAIN]:
+        hass.data[DOMAIN]["values"] = {}
+    stored = await store.async_load() or {}
+    hass.data[DOMAIN]["values"].update(stored)
+    hass.data[DOMAIN]["store"] = store
     async_add_entities([HeatCostAllocatorNumber(hass, prefix, config_entry.entry_id, area_id)])
 
 class HeatCostAllocatorNumber(NumberEntity):
@@ -37,6 +49,10 @@ class HeatCostAllocatorNumber(NumberEntity):
         if "values" not in self.hass.data[DOMAIN]:
             self.hass.data[DOMAIN]["values"] = {}
         self.hass.data[DOMAIN]["values"][self._config_entry_id] = self._attr_native_value
+        # Persist values
+        store = self.hass.data[DOMAIN].get("store")
+        if store:
+            await store.async_save(self.hass.data[DOMAIN]["values"])
         self.async_write_ha_state()
         # Notify the sensor entity to update
         sensor = self.hass.data[DOMAIN].get("sensor_entity")

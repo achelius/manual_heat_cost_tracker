@@ -18,6 +18,12 @@ class HeatCostAllocatorNumber(NumberEntity):
         self._attr_unique_id = f"{prefix}_heat_cost_allocator_set_value"
         self._attr_native_unit_of_measurement = "units"
         self._attr_native_value = 0
+        self._attr_mode = "box"  # Use numeric up/down instead of slider
+        self._attr_native_min_value = 0
+        self._attr_native_max_value = 999999
+        self._attr_native_step = 1
+        self._attr_device_class = None
+        self._attr_state_class = None
 
     @property
     def device_info(self):
@@ -25,7 +31,7 @@ class HeatCostAllocatorNumber(NumberEntity):
 
     @property
     def native_value(self):
-        return self._attr_native_value
+        return int(self._attr_native_value)
 
     async def async_set_native_value(self, value: float) -> None:
         self._attr_native_value = int(value)

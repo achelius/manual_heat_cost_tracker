@@ -11,7 +11,8 @@
   "integration_type": "device",
   "supported_platforms": [
     "sensor",
-    "number"
+    "number",
+    "average_daily"
   ],
   "config_flow": true,
   "icon": "icon.png"

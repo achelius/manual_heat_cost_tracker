@@ -71,26 +71,34 @@ class HeatCostAllocatorAverageDailyConsumption(SensorEntity):
     def device_info(self):
         return get_device_info(self._prefix, self._config_entry_id, self._area_id)
 
+    async def async_added_to_hass(self):
+        """When entity is added to hass."""
+        await super().async_added_to_hass()
+        # Initial update
+        await self.async_update()
+
     async def async_update(self):
         """Update the sensor value."""
-        # Get the number entity that tracks the main value
-        sensor_entity_id = f"number.{self._prefix.lower().replace(' ', '_')}_heat_cost_allocator_set_value"
+        # Get the sensor entity ID for this device (the main value sensor)
+        main_sensor_entity_id = f"sensor.{self._prefix.lower().replace(' ', '_')}_heat_cost_allocator_value"
         
         # Get history for the last 30 days
         now = dt_util.now()
         start_time = now - timedelta(days=30)
         
         try:
-            history = await self.hass.components.history.async_get_history(
+            from homeassistant.components.history import async_get_history
+            
+            history = await async_get_history(
                 self.hass,
-                sensor_entity_id,
+                main_sensor_entity_id,
                 start_time,
                 now,
             )
             
-            if history and sensor_entity_id in history:
-                states = history[sensor_entity_id]
-                if len(states) >= 2:
+            if history and main_sensor_entity_id in history:
+                states = history[main_sensor_entity_id]
+                if isinstance(states, list) and len(states) >= 2:
                     # Get first and last state values
                     first_state = states[0]
                     last_state = states[-1]

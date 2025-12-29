@@ -32,6 +32,5 @@ async def async_setup_services(hass: HomeAssistant):
     hass.services.async_register(
         DOMAIN,
         "cleanup_zero_statistics",
-        cleanup_statistics,
-        description="Clean up zero value statistics from Heat Cost Allocator number entities"
+        cleanup_statistics
     )

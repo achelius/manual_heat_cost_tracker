@@ -82,9 +82,20 @@ class HeatCostAllocatorAverageDailyConsumption(SensorEntity):
         # Get the sensor entity ID for this device (the main value sensor)
         main_sensor_entity_id = f"sensor.{self._prefix.lower().replace(' ', '_')}_heat_cost_allocator_value"
         
-        # Get history for the last 30 days
+        # Get current value from the state
+        current_state = self.hass.states.get(main_sensor_entity_id)
+        if not current_state or current_state.state == "unknown":
+            return
+        
+        try:
+            current_value = float(current_state.state)
+            current_date = current_state.last_updated
+        except (ValueError, TypeError):
+            return
+        
+        # Get history for the last 31 days to find value before the 30-day window
         now = dt_util.now()
-        start_time = now - timedelta(days=30)
+        start_time = now - timedelta(days=31)
         
         try:
             from homeassistant.components.history import async_get_history
@@ -98,26 +109,33 @@ class HeatCostAllocatorAverageDailyConsumption(SensorEntity):
             
             if history and main_sensor_entity_id in history:
                 states = history[main_sensor_entity_id]
-                if isinstance(states, list) and len(states) >= 2:
-                    # Get first and last state values
-                    first_state = states[0]
-                    last_state = states[-1]
-                    
-                    first_value = 0
-                    last_value = 0
+                if isinstance(states, list) and len(states) >= 1:
+                    # Get the first state (oldest) which is before the 30-day window
+                    old_state = states[0]
                     
                     try:
-                        first_value = float(first_state.get("state", 0))
-                        last_value = float(last_state.get("state", 0))
+                        old_value = float(old_state.get("state", 0))
+                        # Parse the last_changed timestamp
+                        old_date_str = old_state.get("last_changed")
+                        if old_date_str:
+                            old_date = dt_util.parse_datetime(old_date_str)
+                        else:
+                            return
                     except (ValueError, TypeError):
                         return
                     
-                    # Calculate consumption (difference)
-                    consumption = last_value - first_value
+                    if not old_date:
+                        return
                     
-                    # Calculate average per day (30 days)
-                    if consumption >= 0:
-                        average_daily = consumption / 30
+                    # Calculate consumption (difference)
+                    consumption = current_value - old_value
+                    
+                    # Calculate days between old_date and current_date
+                    days_diff = (current_date - old_date).days
+                    
+                    # Calculate average per day
+                    if days_diff > 0 and consumption >= 0:
+                        average_daily = consumption / days_diff
                         self._attr_native_value = round(average_daily, 2)
         except Exception:
             # If history is not available, leave value as None

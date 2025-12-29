@@ -29,7 +29,11 @@ class HeatCostAllocatorNumber(NumberEntity):
         self._attr_name = f"{prefix} Heat Cost Allocator Set Value"
         self._attr_unique_id = f"{prefix}_heat_cost_allocator_set_value"
         self._attr_native_unit_of_measurement = "units"
-        self._attr_native_value = 0
+        # Load stored value or default to 0
+        stored_value = None
+        if DOMAIN in hass.data and "values" in hass.data[DOMAIN]:
+            stored_value = hass.data[DOMAIN]["values"].get(config_entry_id)
+        self._attr_native_value = int(stored_value) if stored_value is not None else 0
         self._attr_mode = "box"  # Use numeric up/down instead of slider
         self._attr_native_min_value = 0
         self._attr_native_max_value = 999999

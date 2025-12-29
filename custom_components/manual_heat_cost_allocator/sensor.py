@@ -27,7 +27,7 @@ class HeatCostAllocatorSensor(SensorEntity):
         self._attr_name = f"{prefix} Heat Cost Allocator Value"
         self._attr_unique_id = f"{prefix}_heat_cost_allocator_value"
         self._attr_native_unit_of_measurement = "units"
-        self._attr_native_value = 0
+        self._attr_native_value = None  # Don't set initial value
 
     @property
     def device_info(self):
@@ -41,7 +41,7 @@ class HeatCostAllocatorSensor(SensorEntity):
             value = self.hass.data[DOMAIN]["values"].get(self._config_entry_id)
         if value is not None:
             return int(value)
-        return self._attr_native_value
+        return self._attr_native_value  # Will be None until value is set
 
     def update_value(self, value: int):
         self._attr_native_value = int(value)

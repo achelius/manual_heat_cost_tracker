@@ -84,13 +84,13 @@ class HeatCostAllocatorAverageDailyConsumption(SensorEntity):
         
         # Get current value from the state
         current_state = self.hass.states.get(main_sensor_entity_id)
-        if not current_state or current_state.state == "unknown":
+        if not current_state or current_state.state == "unknown" or current_state.state is None:
             return
         
         try:
             current_value = float(current_state.state)
             current_date = current_state.last_updated
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, AttributeError):
             return
         
         # Get history for the last 31 days to find value before the 30-day window
@@ -107,36 +107,42 @@ class HeatCostAllocatorAverageDailyConsumption(SensorEntity):
                 now,
             )
             
-            if history and main_sensor_entity_id in history:
-                states = history[main_sensor_entity_id]
-                if isinstance(states, list) and len(states) >= 1:
-                    # Get the first state (oldest) which is before the 30-day window
-                    old_state = states[0]
-                    
-                    try:
-                        old_value = float(old_state.get("state", 0))
-                        # Parse the last_changed timestamp
-                        old_date_str = old_state.get("last_changed")
-                        if old_date_str:
-                            old_date = dt_util.parse_datetime(old_date_str)
-                        else:
-                            return
-                    except (ValueError, TypeError):
-                        return
-                    
-                    if not old_date:
-                        return
-                    
-                    # Calculate consumption (difference)
-                    consumption = current_value - old_value
-                    
-                    # Calculate days between old_date and current_date
-                    days_diff = (current_date - old_date).days
-                    
-                    # Calculate average per day
-                    if days_diff > 0 and consumption >= 0:
-                        average_daily = consumption / days_diff
-                        self._attr_native_value = round(average_daily, 2)
-        except Exception:
-            # If history is not available, leave value as None
+            if not history or main_sensor_entity_id not in history:
+                return
+            
+            states = history[main_sensor_entity_id]
+            if not isinstance(states, list) or len(states) < 1:
+                return
+            
+            # Get the first state (oldest) which is before the 30-day window
+            old_state = states[0]
+            
+            try:
+                old_value = float(old_state.get("state", 0))
+                # Parse the last_changed timestamp
+                old_date_str = old_state.get("last_changed")
+                if not old_date_str:
+                    return
+                old_date = dt_util.parse_datetime(old_date_str)
+                if not old_date:
+                    return
+            except (ValueError, TypeError, AttributeError):
+                return
+            
+            # Calculate consumption (difference)
+            consumption = current_value - old_value
+            
+            # Calculate days between old_date and current_date
+            time_diff = current_date - old_date
+            days_diff = time_diff.total_seconds() / (24 * 3600)
+            
+            # Calculate average per day
+            if days_diff > 0 and consumption >= 0:
+                average_daily = consumption / days_diff
+                self._attr_native_value = round(average_daily, 2)
+        except Exception as e:
+            # Log error for debugging
+            import logging
+            _LOGGER = logging.getLogger(__name__)
+            _LOGGER.debug(f"Error calculating average daily for {main_sensor_entity_id}: {e}")
             pass
